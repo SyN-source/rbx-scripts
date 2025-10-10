@@ -51,7 +51,7 @@ frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 frameStroke.Parent = mainFrame
 
--- Layout using UIListLayout for even spacing
+-- Layout for even spacing
 local layout = Instance.new("UIListLayout")
 layout.Parent = mainFrame
 layout.FillDirection = Enum.FillDirection.Vertical
@@ -124,12 +124,23 @@ button.MouseLeave:Connect(function()
     button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 end)
 
--- Rejoin function
+-- Safe Rejoin function with reset on failure
 local function rejoinServer()
     button.Text = "Rejoining..."
     button.BackgroundColor3 = Color3.fromRGB(10, 30, 80)
-    wait(0.4)
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+    button.Active = false
+
+    local success, err = pcall(function()
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+    end)
+
+    if not success then
+        warn("Failed to rejoin server: "..tostring(err))
+        -- Reset button
+        button.Text = "Rejoin"
+        button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
+        button.Active = true
+    end
 end
 
 -- Button click
