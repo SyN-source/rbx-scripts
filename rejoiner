@@ -20,11 +20,11 @@ screenGui.Name = "RejoinGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame (smaller)
+-- Main Frame (cube)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0.15, 0, 0.18, 0)  -- smaller width and height
-mainFrame.Position = UDim2.new(0.8, 0, 0.5, -0.09*workspace.CurrentCamera.ViewportSize.Y) -- right-middle
-mainFrame.AnchorPoint = Vector2.new(0, 0.5)
+mainFrame.Size = UDim2.new(0, 150, 0, 150)  -- square cube
+mainFrame.Position = UDim2.new(1, -170, 0.5, -75) -- middle-right
+mainFrame.AnchorPoint = Vector2.new(0, 0.5) -- vertical center
 mainFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -51,21 +51,18 @@ frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 frameStroke.Parent = mainFrame
 
--- Layout using UIListLayout for automatic spacing
+-- Layout using UIListLayout for even spacing
 local layout = Instance.new("UIListLayout")
 layout.Parent = mainFrame
 layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
 layout.SortOrder = Enum.SortOrder.LayoutOrder
-layout.Padding = UDim.new(0, 6) -- smaller spacing
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    mainFrame.Size = UDim2.new(mainFrame.Size.X.Scale, 0, 0, layout.AbsoluteContentSize.Y + 12)
-end)
+layout.Padding = UDim.new(0, 4)
 
 -- Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -12, 0, 25) -- slightly smaller
+title.Size = UDim2.new(1, -12, 0, 25)
 title.BackgroundTransparency = 1
 title.Text = "Server Rejoiner"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -74,7 +71,7 @@ title.TextSize = 16
 title.TextYAlignment = Enum.TextYAlignment.Center
 title.Parent = mainFrame
 
--- Subtitle
+-- Subtitle: Made by SyN
 local subtitle = Instance.new("TextLabel")
 subtitle.Size = UDim2.new(1, -12, 0, 18)
 subtitle.BackgroundTransparency = 1
@@ -92,17 +89,17 @@ keyLabel.BackgroundTransparency = 1
 keyLabel.TextColor3 = Color3.fromRGB(180, 200, 255)
 keyLabel.Font = Enum.Font.Gotham
 keyLabel.TextSize = 12
-keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
+keyLabel.Text = "Key: "..player:GetAttribute("RejoinKey").Name
 keyLabel.TextYAlignment = Enum.TextYAlignment.Center
 keyLabel.Parent = mainFrame
 
 -- Rejoin Button
 local button = Instance.new("TextButton")
-button.Size = UDim2.new(0.8, 0, 0, 35)
+button.Size = UDim2.new(0.7, 0, 0, 35)
 button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
 button.Font = Enum.Font.GothamBold
-button.TextSize = 18
+button.TextSize = 16
 button.Text = "Rejoin"
 button.Parent = mainFrame
 
@@ -118,12 +115,12 @@ stroke.Parent = button
 
 -- Button hover animation
 button.MouseEnter:Connect(function()
-    button:TweenSize(UDim2.new(0.85, 0, 0, 38), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+    button:TweenSize(UDim2.new(0.75, 0, 0, 38), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
     button.BackgroundColor3 = Color3.fromRGB(40, 70, 180)
 end)
 
 button.MouseLeave:Connect(function()
-    button:TweenSize(UDim2.new(0.8, 0, 0, 35), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+    button:TweenSize(UDim2.new(0.7, 0, 0, 35), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
     button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 end)
 
@@ -148,5 +145,5 @@ end)
 
 -- Dynamic keybind label update
 player:GetAttributeChangedSignal("RejoinKey"):Connect(function()
-    keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
+    keyLabel.Text = "Key: "..player:GetAttribute("RejoinKey").Name
 end)
