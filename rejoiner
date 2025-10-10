@@ -8,7 +8,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 
 -- Default key
-local defaultKey = Enum.KeyCode.T
+local defaultKey = Enum.KeyCode.U
 player:SetAttribute("RejoinKey", defaultKey)
 
 -- Prevent duplicate GUIs
@@ -22,8 +22,9 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 
 -- Main Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 220, 0, 180) -- slightly taller for spacing
-mainFrame.Position = UDim2.new(1, -240, 0.5, -90)
+mainFrame.Size = UDim2.new(0.2, 0, 0.25, 0)  -- 20% width, 25% height of screen
+mainFrame.Position = UDim2.new(0.8, 0, 0.5, -0.125*workspace.CurrentCamera.ViewportSize.Y) -- right-middle
+mainFrame.AnchorPoint = Vector2.new(0,0.5) -- vertical center
 mainFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -50,43 +51,54 @@ frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 frameStroke.Parent = mainFrame
 
+-- Layout using UIListLayout for automatic spacing
+local layout = Instance.new("UIListLayout")
+layout.Parent = mainFrame
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 10) -- 10 pixels spacing
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    mainFrame.Size = UDim2.new(mainFrame.Size.X.Scale, 0, 0, layout.AbsoluteContentSize.Y + 20)
+end)
+
 -- Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 10)
+title.Size = UDim2.new(1, -20, 0, 30)
 title.BackgroundTransparency = 1
 title.Text = "Server Rejoiner"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
+title.TextYAlignment = Enum.TextYAlignment.Center
 title.Parent = mainFrame
 
 -- Subtitle
 local subtitle = Instance.new("TextLabel")
-subtitle.Size = UDim2.new(1, 0, 0, 20)
-subtitle.Position = UDim2.new(0, 0, 0, 40)
+subtitle.Size = UDim2.new(1, -20, 0, 20)
 subtitle.BackgroundTransparency = 1
 subtitle.Text = "Made by SyN"
 subtitle.TextColor3 = Color3.fromRGB(180, 200, 255)
 subtitle.Font = Enum.Font.Gotham
 subtitle.TextSize = 14
+subtitle.TextYAlignment = Enum.TextYAlignment.Center
 subtitle.Parent = mainFrame
 
 -- Keybind Label
 local keyLabel = Instance.new("TextLabel")
-keyLabel.Size = UDim2.new(1, 0, 0, 20)
-keyLabel.Position = UDim2.new(0, 0, 0, 70) -- spaced below subtitle
+keyLabel.Size = UDim2.new(1, -20, 0, 20)
 keyLabel.BackgroundTransparency = 1
 keyLabel.TextColor3 = Color3.fromRGB(180, 200, 255)
 keyLabel.Font = Enum.Font.Gotham
 keyLabel.TextSize = 14
 keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
+keyLabel.TextYAlignment = Enum.TextYAlignment.Center
 keyLabel.Parent = mainFrame
 
 -- Rejoin Button
 local button = Instance.new("TextButton")
 button.Size = UDim2.new(0.8, 0, 0, 40)
-button.Position = UDim2.new(0.1, 0, 0, 100) -- spaced below keybind label
 button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
 button.Font = Enum.Font.GothamBold
@@ -94,7 +106,6 @@ button.TextSize = 20
 button.Text = "Rejoin"
 button.Parent = mainFrame
 
--- Button styling
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = button
@@ -135,7 +146,7 @@ UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
--- Dynamic keybind label update (optional for future)
+-- Dynamic keybind label update
 player:GetAttributeChangedSignal("RejoinKey"):Connect(function()
     keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
 end)
