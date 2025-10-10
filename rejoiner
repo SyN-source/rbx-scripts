@@ -3,116 +3,139 @@
 -- Services
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 
--- Create ScreenGui
+-- Default key
+local defaultKey = Enum.KeyCode.T
+player:SetAttribute("RejoinKey", defaultKey)
+
+-- Prevent duplicate GUIs
+if player:WaitForChild("PlayerGui"):FindFirstChild("RejoinGUI") then return end
+
+-- Create GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "RejoinGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame (compact draggable box)
+-- Main Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 220, 0, 120)
-mainFrame.Position = UDim2.new(1, -240, 0.5, -60) -- middle-right
+mainFrame.Size = UDim2.new(0, 220, 0, 180) -- slightly taller for spacing
+mainFrame.Position = UDim2.new(1, -240, 0.5, -90)
 mainFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
--- Gradient background (black → dark blue)
+-- Gradient
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 5, 10)),    -- top: blackish
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 25, 80))   -- bottom: dark blue
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 5, 10)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 25, 80))
 }
 gradient.Rotation = 270
 gradient.Parent = mainFrame
 
--- Rounded corners
+-- Rounded corners & outline
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 12)
 frameCorner.Parent = mainFrame
 
--- White outline
 local frameStroke = Instance.new("UIStroke")
 frameStroke.Thickness = 2
 frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 frameStroke.Parent = mainFrame
 
--- Title Label
+-- Title
 local title = Instance.new("TextLabel")
-title.Name = "TitleLabel"
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 8)
+title.Position = UDim2.new(0, 0, 0, 10)
 title.BackgroundTransparency = 1
 title.Text = "Server Rejoiner"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
-title.TextStrokeTransparency = 0.8
 title.Parent = mainFrame
 
--- Subtitle (“Made by SyN”)
+-- Subtitle
 local subtitle = Instance.new("TextLabel")
-subtitle.Name = "Subtitle"
 subtitle.Size = UDim2.new(1, 0, 0, 20)
-subtitle.Position = UDim2.new(0, 0, 0, 35)
+subtitle.Position = UDim2.new(0, 0, 0, 40)
 subtitle.BackgroundTransparency = 1
 subtitle.Text = "Made by SyN"
 subtitle.TextColor3 = Color3.fromRGB(180, 200, 255)
 subtitle.Font = Enum.Font.Gotham
 subtitle.TextSize = 14
-subtitle.TextStrokeTransparency = 0.9
 subtitle.Parent = mainFrame
+
+-- Keybind Label
+local keyLabel = Instance.new("TextLabel")
+keyLabel.Size = UDim2.new(1, 0, 0, 20)
+keyLabel.Position = UDim2.new(0, 0, 0, 70) -- spaced below subtitle
+keyLabel.BackgroundTransparency = 1
+keyLabel.TextColor3 = Color3.fromRGB(180, 200, 255)
+keyLabel.Font = Enum.Font.Gotham
+keyLabel.TextSize = 14
+keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
+keyLabel.Parent = mainFrame
 
 -- Rejoin Button
 local button = Instance.new("TextButton")
-button.Name = "RejoinButton"
 button.Size = UDim2.new(0.8, 0, 0, 40)
-button.Position = UDim2.new(0.1, 0, 0.6, 0)
-button.BackgroundColor3 = Color3.fromRGB(20, 40, 100) -- dark blue
+button.Position = UDim2.new(0.1, 0, 0, 100) -- spaced below keybind label
+button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
 button.Font = Enum.Font.GothamBold
 button.TextSize = 20
 button.Text = "Rejoin"
 button.Parent = mainFrame
 
--- Rounded corners for button
+-- Button styling
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = button
 
--- Outline for button
 local stroke = Instance.new("UIStroke")
 stroke.Thickness = 2
 stroke.Color = Color3.fromRGB(255, 255, 255)
 stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 stroke.Parent = button
 
--- Hover animation
+-- Button hover animation
 button.MouseEnter:Connect(function()
-	button:TweenSize(UDim2.new(0.85, 0, 0, 45), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-	button.BackgroundColor3 = Color3.fromRGB(40, 70, 180)
+    button:TweenSize(UDim2.new(0.85, 0, 0, 45), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+    button.BackgroundColor3 = Color3.fromRGB(40, 70, 180)
 end)
 
 button.MouseLeave:Connect(function()
-	button:TweenSize(UDim2.new(0.8, 0, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-	button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
+    button:TweenSize(UDim2.new(0.8, 0, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+    button.BackgroundColor3 = Color3.fromRGB(20, 40, 100)
 end)
 
--- Click effect + rejoin same server
-button.MouseButton1Click:Connect(function()
-	button.Text = "Rejoining..."
-	button.BackgroundColor3 = Color3.fromRGB(10, 30, 80)
-	wait(0.4)
+-- Rejoin function
+local function rejoinServer()
+    button.Text = "Rejoining..."
+    button.BackgroundColor3 = Color3.fromRGB(10, 30, 80)
+    wait(0.4)
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+end
 
-	local placeId = game.PlaceId
-	local jobId = game.JobId
+-- Button click
+button.MouseButton1Click:Connect(rejoinServer)
 
-	TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
+-- Key press detection
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == player:GetAttribute("RejoinKey") then
+        rejoinServer()
+    end
+end)
+
+-- Dynamic keybind label update (optional for future)
+player:GetAttributeChangedSignal("RejoinKey"):Connect(function()
+    keyLabel.Text = "Keybind: "..player:GetAttribute("RejoinKey").Name
 end)
