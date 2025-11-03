@@ -1,0 +1,42 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+--// ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "BanGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+--// Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 180, 0, 50)
+frame.Position = UDim2.new(1, -190, 1, -60)
+frame.BackgroundTransparency = 1
+frame.Parent = screenGui
+
+--// UI Stroke (Red outline)
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255, 0, 0)
+stroke.Thickness = 2
+stroke.Transparency = 0.3
+stroke.Parent = frame
+
+--// Label
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 1, 0)
+label.BackgroundTransparency = 1
+label.Text = "Press [T] to Leave"
+label.Font = Enum.Font.GothamBold
+label.TextColor3 = Color3.fromRGB(255, 60, 60)
+label.TextStrokeTransparency = 0.5
+label.TextScaled = true
+label.Parent = frame
+
+--// Input detection
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.T then
+		player:Kick("You’ve been banned for exploiting.")
+	end
+end)
